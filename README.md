@@ -1,4 +1,4 @@
-# Qwen quantization lab
+# Aura quantization lab
 
 This repository is a small harness for comparing a BF16 Qwen
 checkpoint with LLM Compressor FP8 dynamic and calibrated INT8 W8A8 checkpoints.
