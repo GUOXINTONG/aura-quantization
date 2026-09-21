@@ -1,0 +1,10 @@
+torch
+torchvision
+transformers
+llmcompressor
+compressed-tensors
+datasets
+accelerate
+safetensors
+huggingface-hub
+pyyaml

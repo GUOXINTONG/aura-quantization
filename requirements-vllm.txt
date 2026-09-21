@@ -1,0 +1,7 @@
+vllm==0.19.0
+torch
+torchvision
+transformers
+compressed-tensors
+pyyaml
+pynvml

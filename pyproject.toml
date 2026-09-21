@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qwen-quantization-lab"
+version = "0.1.0"
+description = "Small experimental FP8 and INT8 quantization lab for Qwen checkpoints"
+requires-python = ">=3.10"
+dependencies = ["PyYAML"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

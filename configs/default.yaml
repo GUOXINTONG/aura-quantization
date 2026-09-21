@@ -1,0 +1,46 @@
+model:
+  source: Qwen/Qwen3.5-9B
+  trust_remote_code: true
+  dtype: auto
+
+output:
+  root: outputs
+  fp8_dir: outputs/Qwen3.5-9B-FP8-Dynamic
+  int8_dir: outputs/Qwen3.5-9B-INT8-W8A8
+  results_dir: outputs/results
+
+quantization:
+  ignored_layers:
+    - lm_head
+    - "re:.*embed_tokens.*"
+    - "re:.*visual.*"
+    - "re:^mtp\\..*"
+    # Conv1d kernels are 3-D and cannot use the 2-D FP8 linear-weight scheme.
+    - "re:.*linear_attn\\.conv1d.*"
+  ignore_linear_attention: false
+
+fp8:
+  scheme: FP8_DYNAMIC
+  device: cuda:0
+  max_workers: 1
+
+int8:
+  calibration_dataset: HuggingFaceH4/ultrachat_200k
+  calibration_split: train_sft
+  calibration_samples: 512
+  max_sequence_length: 2048
+  seed: 42
+  smoothquant_strength: 0.8
+
+evaluation:
+  seed: 42
+  temperature: 0.0
+  max_tokens: 256
+  max_model_len: 4096
+  tensor_parallel_size: 1
+  gpu_memory_utilization: 0.90
+  repeat_count: 3
+  concurrency: [1, 2, 4]
+
+serving:
+  standard_vllm_smoke_test: true
