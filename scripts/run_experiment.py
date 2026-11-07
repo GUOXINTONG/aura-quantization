@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -12,6 +13,8 @@ from qwen_quant_lab.config import cli_overrides, comma_list, load_config
 
 
 VALID_STEPS = ("inspect", "fp8", "int8", "validate", "generate", "benchmark", "compare")
+DEFAULT_PROMPTS = Path(__file__).resolve().parents[1] / "data" / "evaluation_prompts.jsonl"
+REUSABLE_STATUSES = {"complete", "quantized_pending_runtime_validation"}
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -36,6 +39,42 @@ def _base(script: str, args) -> list[str]:
     return command
 
 
+def existing_checkpoint_reusable(output: Path, config) -> tuple[bool, str]:
+    """Only reuse a checkpoint built from the same source and ignore patterns
+    whose recorded status shows quantization and validation succeeded."""
+    metadata_path = output / "experiment_metadata.json"
+    if not metadata_path.is_file():
+        return False, "experiment_metadata.json is missing"
+    try:
+        metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    except Exception as exc:
+        return False, f"experiment_metadata.json is unreadable: {exc}"
+    status = metadata.get("status")
+    if status not in REUSABLE_STATUSES:
+        return False, f"status={status!r}"
+    if metadata.get("source_model") != config.model.source:
+        return False, (
+            f"built from {metadata.get('source_model')!r}, "
+            f"current source is {config.model.source!r}"
+        )
+    ignored = config.ignored_layers()
+    if metadata.get("ignored_module_patterns") != ignored:
+        return False, "ignore patterns differ from the current configuration"
+    return True, f"status={status}"
+
+
+def preflight(steps: list[str], config) -> None:
+    """Catch missing inputs before spending GPU time on earlier stages."""
+    problems = []
+    if "generate" in steps and not DEFAULT_PROMPTS.is_file():
+        problems.append(f"evaluation prompts not found: {DEFAULT_PROMPTS}")
+    local_source = Path(config.model.source).expanduser()
+    if config.model.source.startswith(("/", "./", "../", "~")) and not local_source.exists():
+        problems.append(f"local model path does not exist: {local_source}")
+    if problems:
+        raise SystemExit("Preflight failed:\n  - " + "\n  - ".join(problems))
+
+
 def planned_commands(args, config) -> list[tuple[str, list[str]]]:
     steps = comma_list(args.steps)
     unknown = sorted(set(steps) - set(VALID_STEPS))
@@ -51,8 +90,16 @@ def planned_commands(args, config) -> list[tuple[str, list[str]]]:
         elif step in {"fp8", "int8"}:
             output = Path(config.output.fp8_dir if step == "fp8" else config.output.int8_dir)
             if args.skip_existing and output.is_dir() and any(output.iterdir()):
-                print(f"Skipping existing {step} checkpoint: {output}")
-                continue
+                reusable, reason = existing_checkpoint_reusable(output, config)
+                if reusable:
+                    print(f"Skipping existing {step} checkpoint: {output} ({reason})")
+                    continue
+                print(f"Existing {step} checkpoint is not reusable: {output} ({reason})")
+                if not args.overwrite:
+                    raise SystemExit(
+                        f"Refusing to reuse {output}: {reason}. "
+                        "Pass --overwrite to rebuild it, or choose another output directory."
+                    )
             command = _base(f"quantize_{step}.py", args)
             if args.overwrite:
                 command.append("--overwrite")
@@ -79,8 +126,11 @@ def planned_commands(args, config) -> list[tuple[str, list[str]]]:
                     str(config.evaluation.tensor_parallel_size),
                     "--gpu-memory-utilization",
                     str(config.evaluation.gpu_memory_utilization),
+                    "--trust-remote-code"
+                    if config.model.trust_remote_code
+                    else "--no-trust-remote-code",
                 ]
-                if args.skip_runtime_validation:
+                if args.skip_runtime_validation or not config.serving.standard_vllm_smoke_test:
                     command.append("--skip-runtime")
                 commands.append((f"validate-{variant}", command))
         elif step == "generate":
@@ -101,6 +151,7 @@ def main() -> int:
             ignore_linear_attention=args.ignore_linear_attention,
         ),
     )
+    preflight(comma_list(args.steps), config)
     commands = planned_commands(args, config)
     if args.dry_run:
         print("Dry run: no models will be downloaded or loaded and no output will be modified.")

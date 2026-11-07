@@ -23,7 +23,12 @@ class InspectionTests(unittest.TestCase):
                 ),
                 encoding="utf-8",
             )
-            (root / "model.safetensors").write_bytes(b"placeholder")
+            header = {
+                name: {"dtype": "F32", "shape": [0], "data_offsets": [0, 0]}
+                for name in ("model.layers.0.self_attn.q_proj.weight", "lm_head.weight")
+            }
+            raw = json.dumps(header).encode("utf-8")
+            (root / "model.safetensors").write_bytes(len(raw).to_bytes(8, "little") + raw)
             (root / "model.safetensors.index.json").write_text(
                 json.dumps(
                     {

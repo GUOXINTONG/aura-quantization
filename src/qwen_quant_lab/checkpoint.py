@@ -64,22 +64,82 @@ def tensor_index(source: str) -> tuple[set[str], str | None]:
                 return set(), f"could not download tensor index: {exc}"
         with index_path.open("r", encoding="utf-8") as handle:
             value = json.load(handle)
-        return set(value.get("weight_map", {})), None
+        weight_map = value.get("weight_map", {})
+        if not weight_map:
+            return set(), f"{index_name} has an empty weight_map"
+        index_dir = str(Path(index_name).parent)
+        prefix = "" if index_dir == "." else index_dir + "/"
+        shards = sorted({prefix + shard for shard in weight_map.values()})
+        missing_shards = [shard for shard in shards if shard not in names]
+        if missing_shards:
+            return set(), f"{index_name} references missing shards: {missing_shards}"
+        if source_path.exists():
+            # Do not trust the index alone: read each local shard header and
+            # confirm that the index and the real tensors agree.
+            actual: dict[str, str] = {}
+            for shard in shards:
+                try:
+                    for key in safetensors_header_keys(source_path / shard):
+                        actual[key] = shard
+                except Exception as exc:
+                    return set(), f"cannot read shard {shard}: {exc}"
+            expected = {key: prefix + shard for key, shard in weight_map.items()}
+            # Extra unindexed tensors are tolerated; indexed tensors that are
+            # absent or live in a different shard would break loading.
+            not_in_shards = sorted(set(expected) - set(actual))
+            wrong_shard = sorted(
+                key for key in set(expected) & set(actual) if expected[key] != actual[key]
+            )
+            if not_in_shards or wrong_shard:
+                return set(), (
+                    "tensor index does not match shard contents: "
+                    f"indexed_but_absent={not_in_shards[:20]}, "
+                    f"wrong_shard={wrong_shard[:20]}"
+                )
+        return set(weight_map), None
 
     shards = [name for name in names if name.endswith(".safetensors")]
     if not shards:
         return set(), "no safetensors files found"
     if not source_path.exists():
         return set(), "remote unsharded checkpoint has no index; shard was not downloaded"
-    try:
-        from safetensors import safe_open
-    except ImportError:
-        return set(), "safetensors package is not installed"
     tensors: set[str] = set()
     for shard in shards:
-        with safe_open(source_path / shard, framework="pt", device="cpu") as handle:
-            tensors.update(handle.keys())
+        try:
+            tensors.update(safetensors_header_keys(source_path / shard))
+        except Exception as exc:
+            return set(), f"cannot read shard {shard}: {exc}"
     return tensors, None
+
+
+def safetensors_header_keys(path: str | Path) -> list[str]:
+    """Read tensor names from a safetensors header without loading tensor data.
+
+    Format: 8-byte little-endian header length, then a JSON header. This also
+    detects truncated or non-safetensors files.
+    """
+    path = Path(path)
+    size = path.stat().st_size
+    with path.open("rb") as handle:
+        raw_length = handle.read(8)
+        if len(raw_length) != 8:
+            raise ValueError("file is too small to be safetensors")
+        length = int.from_bytes(raw_length, "little")
+        if length <= 0 or 8 + length > size:
+            raise ValueError("invalid safetensors header length")
+        header = json.loads(handle.read(length).decode("utf-8"))
+    if not isinstance(header, dict):
+        raise ValueError("safetensors header is not a JSON object")
+    data_size = size - 8 - length
+    keys = []
+    for key, info in header.items():
+        if key == "__metadata__":
+            continue
+        offsets = info.get("data_offsets") if isinstance(info, dict) else None
+        if not offsets or len(offsets) != 2 or offsets[1] > data_size:
+            raise ValueError(f"tensor {key} points outside the file (truncated shard?)")
+        keys.append(key)
+    return keys
 
 
 def _weight_map(source: str) -> dict[str, str]:

@@ -5,7 +5,7 @@ import argparse
 import json
 from pathlib import Path
 
-import _bootstrap  # noqa: F401
+import _bootstrap
 
 from qwen_quant_lab.config import cli_overrides, comma_list, load_config
 from qwen_quant_lab.inference import generate_with_vllm, read_prompts
@@ -16,7 +16,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--config", default="configs/default.yaml")
     parser.add_argument("--model")
     parser.add_argument("--variants", default="bf16,fp8,int8")
-    parser.add_argument("--prompts", default="data/evaluation_prompts.jsonl")
+    parser.add_argument(
+        "--prompts",
+        default=str(_bootstrap.ROOT / "data" / "evaluation_prompts.jsonl"),
+        help="JSONL prompts file (default: data/evaluation_prompts.jsonl in the repository)",
+    )
     parser.add_argument("--output")
     return parser
 

@@ -184,6 +184,14 @@ def validate_config(config: ExperimentConfig) -> None:
         int(value) < 1 for value in config.evaluation.concurrency
     ):
         raise ValueError("evaluation.concurrency must contain positive integers")
+    if config.evaluation.repeat_count < 1:
+        raise ValueError("evaluation.repeat_count must be at least 1")
+    if config.evaluation.tensor_parallel_size < 1:
+        raise ValueError("evaluation.tensor_parallel_size must be at least 1")
+    if not 0 < config.evaluation.gpu_memory_utilization <= 1:
+        raise ValueError("evaluation.gpu_memory_utilization must be in (0, 1]")
+    if config.evaluation.temperature < 0:
+        raise ValueError("evaluation.temperature cannot be negative")
     if not config.model.source.strip():
         raise ValueError("model.source cannot be empty")
 

@@ -105,11 +105,15 @@ def main() -> int:
         metadata["elapsed_seconds"] = time.perf_counter() - started
         write_json(output / "experiment_metadata.json", metadata)
 
+    # serving.standard_vllm_smoke_test=false behaves like --skip-runtime-validation.
+    run_runtime = (
+        not args.skip_runtime_validation and config.serving.standard_vllm_smoke_test
+    )
     report = validate_checkpoint(
         config.model.source,
         output,
         trust_remote_code=config.model.trust_remote_code,
-        run_runtime=not args.skip_runtime_validation,
+        run_runtime=run_runtime,
         max_model_len=config.evaluation.max_model_len,
         tensor_parallel_size=config.evaluation.tensor_parallel_size,
         gpu_memory_utilization=config.evaluation.gpu_memory_utilization,
@@ -118,7 +122,7 @@ def main() -> int:
     validation_passed = report["overall_status"] in {"pass", "pass_with_warnings"}
     metadata["status"] = (
         "quantized_pending_runtime_validation"
-        if validation_passed and args.skip_runtime_validation
+        if validation_passed and not run_runtime
         else ("complete" if validation_passed else "invalid")
     )
     write_json(output / "experiment_metadata.json", metadata)

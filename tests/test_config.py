@@ -31,6 +31,13 @@ class ConfigTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "calibration_samples"):
                 load_config(path)
 
+    def test_zero_repeat_count_fails(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "config.yaml"
+            path.write_text("evaluation:\n  repeat_count: 0\n", encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "repeat_count"):
+                load_config(path)
+
 
 if __name__ == "__main__":
     unittest.main()

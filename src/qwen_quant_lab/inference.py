@@ -20,7 +20,11 @@ def read_prompts(path: str | Path) -> list[dict[str, Any]]:
                 raise ValueError(f"Invalid JSONL at {path}:{line_number}: {exc}") from exc
             if not value.get("id") or not value.get("prompt"):
                 raise ValueError(f"Prompt at {path}:{line_number} needs id and prompt")
+            if any(item["id"] == value["id"] for item in prompts):
+                raise ValueError(f"Duplicate prompt id at {path}:{line_number}: {value['id']}")
             prompts.append(value)
+    if not prompts:
+        raise ValueError(f"No prompts found in {path}")
     return prompts
 
 
@@ -64,8 +68,14 @@ def generate_with_vllm(
             [item["prompt"] for item in prompt_list], params, use_tqdm=False
         )
         elapsed = time.perf_counter() - started
+        # All prompts run as one offline batch, so per-request wall-clock latency
+        # is not observable here. Record the batch time and an amortized value
+        # under names that cannot be mistaken for real request latency.
+        amortized = elapsed / len(outputs) if outputs else None
+        batch_output_tokens = sum(
+            len(item.outputs[0].token_ids) for item in outputs if item.outputs
+        )
         records = []
-        per_request = elapsed / len(outputs) if outputs else 0.0
         for prompt, result in zip(prompt_list, outputs):
             candidate = result.outputs[0] if result.outputs else None
             text = candidate.text if candidate else ""
@@ -78,14 +88,34 @@ def generate_with_vllm(
                     "prompt": prompt["prompt"],
                     "expected_keys": prompt.get("expected_keys"),
                     "output": text,
-                    "latency_seconds": per_request,
+                    "finish_reason": getattr(candidate, "finish_reason", None),
+                    "batch_size": len(prompt_list),
+                    "batch_elapsed_seconds": elapsed,
+                    "amortized_latency_seconds": amortized,
+                    "batch_output_tokens_per_second": (
+                        batch_output_tokens / elapsed if elapsed else None
+                    ),
                     "input_tokens": len(result.prompt_token_ids or []),
                     "output_tokens": output_tokens,
-                    "tokens_per_second": output_tokens / per_request if per_request else None,
                     "success": bool(candidate),
                     "error": None if candidate else "vLLM returned no candidate",
                 }
             )
+        returned = {record["prompt_id"] for record in records}
+        for prompt in prompt_list:
+            if prompt["id"] not in returned:
+                records.append(
+                    {
+                        "model_variant": variant,
+                        "prompt_id": prompt["id"],
+                        "category": prompt.get("category", "unknown"),
+                        "prompt": prompt["prompt"],
+                        "expected_keys": prompt.get("expected_keys"),
+                        "output": "",
+                        "success": False,
+                        "error": "vLLM returned no result for this prompt",
+                    }
+                )
         return records
     finally:
         if llm is not None:
