@@ -7,3 +7,6 @@ outputs/*
 outputs-smoke/*
 !outputs/.gitkeep
 *.egg-info/
+
+# pip install logs
+*.lo
