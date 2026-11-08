@@ -31,6 +31,20 @@ class ConfigTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "calibration_samples"):
                 load_config(path)
 
+    def test_inference_options_load_from_yaml(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "config.yaml"
+            path.write_text(
+                "evaluation:\n"
+                "  skip_special_tokens: false\n"
+                "  chat_template_kwargs:\n"
+                "    enable_thinking: false\n",
+                encoding="utf-8",
+            )
+            config = load_config(path)
+        self.assertFalse(config.evaluation.skip_special_tokens)
+        self.assertEqual(config.evaluation.chat_template_kwargs, {"enable_thinking": False})
+
     def test_zero_repeat_count_fails(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "config.yaml"

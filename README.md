@@ -227,6 +227,8 @@ CLI 参数优先级高于 YAML。加载时会做基本的合法性检查，未�
 | `evaluation.tensor_parallel_size` / `gpu_memory_utilization` | vLLM 参数 |
 | `evaluation.concurrency` | benchmark 中每次 `generate()` 提交的提示词条数（离线批大小） |
 | `evaluation.repeat_count` | 每个批大小重复次数，至少为 1 |
+| `evaluation.skip_special_tokens` | 生成时是否去掉 special token，默认 `true`（vLLM 默认）。模型会输出 `<|silent|>` 这类有意义的 special token 时设为 `false`，与线上推理保持一致 |
+| `evaluation.chat_template_kwargs` | 传给 `apply_chat_template` 的额外参数，例如 `{enable_thinking: false}`；同时用于评测提示词和 INT8 校准数据渲染 |
 | `serving.standard_vllm_smoke_test` | 设为 `false` 时，量化和 validate 步骤跳过 vLLM 加载与生成验证，效果同 `--skip-runtime-validation` |
 
 ## 量化方案细节
@@ -270,7 +272,7 @@ CLI 参数优先级高于 YAML。加载时会做基本的合法性检查，未�
 | 忽略层精度 | 被忽略的张量和所有视觉张量在输出中必须存在，且 dtype、shape 与源一致 |
 | MTP | 发现输出缺少 `mtp.*` 张量时，用 `compressed_tensors` 官方的 `save_mtp_tensors_to_checkpoint` 补回，重新校验并写入报告（可用 `--no-repair-mtp` 关闭）。不会修补其他任意缺失张量 |
 | Transformers | 加载 config、tokenizer、processor |
-| vLLM | 标准 vLLM 初始化，并至少成功生成一次 |
+| vLLM | 标准 vLLM 初始化，并至少成功生成一次（保留 special token，输出 `<|silent|>` 也算成功生成） |
 
 结果写入 `<检查点>/validation_report.json`，每一项分别记录 `pass` / `fail` / `skip` / `error`。总体状态：
 

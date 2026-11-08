@@ -489,7 +489,11 @@ def vllm_generation_check(
     try:
         output = llm.generate(
             [DEFAULT_VALIDATION_PROMPT],
-            SamplingParams(temperature=0.0, max_tokens=8, seed=0),
+            # Keep special tokens: a model whose answer is e.g. <|silent|> is
+            # still generating, and stripping it would look like empty output.
+            SamplingParams(
+                temperature=0.0, max_tokens=8, seed=0, skip_special_tokens=False
+            ),
             use_tqdm=False,
         )
         text = output[0].outputs[0].text if output and output[0].outputs else ""

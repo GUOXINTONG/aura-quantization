@@ -67,6 +67,13 @@ class EvaluationConfig:
     gpu_memory_utilization: float = 0.9
     repeat_count: int = 3
     concurrency: list[int] = field(default_factory=lambda: [1, 2, 4])
+    # Match the production inference client. A model that emits meaningful
+    # special tokens (for example <|silent|>) needs skip_special_tokens=false,
+    # otherwise vLLM strips them and outputs look empty or wrong.
+    skip_special_tokens: bool = True
+    # Extra arguments for apply_chat_template, e.g. {"enable_thinking": false}.
+    # Used for evaluation prompts and INT8 calibration rendering.
+    chat_template_kwargs: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -190,6 +197,8 @@ def validate_config(config: ExperimentConfig) -> None:
         raise ValueError("evaluation.tensor_parallel_size must be at least 1")
     if not 0 < config.evaluation.gpu_memory_utilization <= 1:
         raise ValueError("evaluation.gpu_memory_utilization must be in (0, 1]")
+    if not isinstance(config.evaluation.chat_template_kwargs, dict):
+        raise ValueError("evaluation.chat_template_kwargs must be a mapping")
     if config.evaluation.temperature < 0:
         raise ValueError("evaluation.temperature cannot be negative")
     if not config.model.source.strip():

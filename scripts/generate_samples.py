@@ -25,7 +25,7 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _apply_chat_template(prompts, source: str, trust_remote_code: bool):
+def _apply_chat_template(prompts, source: str, trust_remote_code: bool, template_kwargs=None):
     try:
         from transformers import AutoTokenizer
 
@@ -41,8 +41,10 @@ def _apply_chat_template(prompts, source: str, trust_remote_code: bool):
                 [{"role": "user", "content": item["prompt"]}],
                 tokenize=False,
                 add_generation_prompt=True,
+                **(template_kwargs or {}),
             )
-        except Exception:
+        except Exception as exc:
+            print(f"WARNING: chat template failed for {item['id']}, using raw prompt: {exc}")
             value["prompt"] = item["prompt"]
         formatted.append(value)
     return formatted
@@ -52,7 +54,10 @@ def main() -> int:
     args = build_parser().parse_args()
     config = load_config(args.config, overrides=cli_overrides(model=args.model))
     prompts = _apply_chat_template(
-        read_prompts(args.prompts), config.model.source, config.model.trust_remote_code
+        read_prompts(args.prompts),
+        config.model.source,
+        config.model.trust_remote_code,
+        config.evaluation.chat_template_kwargs,
     )
     models = {
         "bf16": config.model.source,
@@ -78,6 +83,7 @@ def main() -> int:
                 max_model_len=config.evaluation.max_model_len,
                 tensor_parallel_size=config.evaluation.tensor_parallel_size,
                 gpu_memory_utilization=config.evaluation.gpu_memory_utilization,
+                skip_special_tokens=config.evaluation.skip_special_tokens,
             )
         )
     output = Path(args.output or Path(config.output.results_dir) / "generations.jsonl")

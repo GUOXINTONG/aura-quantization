@@ -40,6 +40,7 @@ def generate_with_vllm(
     max_model_len: int,
     tensor_parallel_size: int,
     gpu_memory_utilization: float,
+    skip_special_tokens: bool = True,
 ) -> list[dict[str, Any]]:
     ensure_vllm_multiprocessing_spawn()
     try:
@@ -62,6 +63,7 @@ def generate_with_vllm(
             temperature=temperature,
             max_tokens=max_tokens,
             seed=seed,
+            skip_special_tokens=skip_special_tokens,
         )
         started = time.perf_counter()
         outputs = llm.generate(

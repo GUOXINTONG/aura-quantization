@@ -148,6 +148,7 @@ def benchmark_variant(name: str, model: str, config) -> dict[str, Any]:
             temperature=config.evaluation.temperature,
             max_tokens=config.evaluation.max_tokens,
             seed=config.evaluation.seed,
+            skip_special_tokens=config.evaluation.skip_special_tokens,
         )
         # Warm up once so CUDA graph capture / kernel compilation is not timed.
         llm.generate([BENCHMARK_PROMPTS[0]], params, use_tqdm=False)

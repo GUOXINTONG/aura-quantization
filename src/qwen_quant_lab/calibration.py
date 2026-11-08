@@ -11,7 +11,9 @@ LOW_CALIBRATION_WARNING = (
 
 
 def render_calibration_examples(
-    examples: Iterable[dict[str, Any]], processor: Any
+    examples: Iterable[dict[str, Any]],
+    processor: Any,
+    chat_template_kwargs: dict[str, Any] | None = None,
 ) -> tuple[list[dict[str, str]], dict[str, int]]:
     """Render chat messages to text; tokenization is left to LLM Compressor.
 
@@ -30,6 +32,7 @@ def render_calibration_examples(
                 messages,
                 tokenize=False,
                 add_generation_prompt=False,
+                **(chat_template_kwargs or {}),
             )
         except Exception:
             dropped += 1
@@ -47,6 +50,7 @@ def prepare_calibration_dataset(
     sample_count: int,
     seed: int,
     processor: Any,
+    chat_template_kwargs: dict[str, Any] | None = None,
 ):
     try:
         from datasets import Dataset, load_dataset
@@ -60,7 +64,7 @@ def prepare_calibration_dataset(
     dataset = load_dataset(dataset_name, split=split)
     dataset = dataset.shuffle(seed=seed)
     dataset = dataset.select(range(min(sample_count, len(dataset))))
-    rendered, stats = render_calibration_examples(dataset, processor)
+    rendered, stats = render_calibration_examples(dataset, processor, chat_template_kwargs)
     if not rendered:
         raise ValueError("No valid calibration examples could be rendered")
     return Dataset.from_list(rendered), stats

@@ -98,6 +98,7 @@ def main() -> int:
             config.int8.calibration_samples,
             config.int8.seed,
             processor,
+            config.evaluation.chat_template_kwargs,
         )
         metadata["calibration"].update(stats)
         print(f"Calibration examples processed={stats['processed']} dropped={stats['dropped']}")
