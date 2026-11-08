@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest import mock
 
 from qwen_quant_lab.checkpoint import compare_tensor_indexes, validate_checkpoint
 
@@ -49,9 +50,14 @@ class CheckpointTests(unittest.TestCase):
             ]
             make_checkpoint(source, tensors, quantized=False)
             make_checkpoint(output, tensors + ["model.layers.0.self_attn.q_proj.weight_scale"], quantized=True)
-            report = validate_checkpoint(
-                str(source), output, run_runtime=False, trust_remote_code=False
-            )
+            # The fake "qwen" config is not loadable by a real Transformers
+            # install, so isolate the structural checks from it.
+            with mock.patch(
+                "qwen_quant_lab.checkpoint.transformers_load_checks", return_value={}
+            ):
+                report = validate_checkpoint(
+                    str(source), output, run_runtime=False, trust_remote_code=False
+                )
             self.assertEqual(report["overall_status"], "pass")
             self.assertEqual(report["checks"]["tensor_index"]["status"], "pass")
 
