@@ -1,0 +1,54 @@
+# Final target: tt-simple-bench-all-64k-fix / v0-20261023-174822 / checkpoint-1467
+# (Qwen3_5ForConditionalGeneration, merged BF16). Evaluation settings mirror the
+# production client in aura_v2_demo/main_dev/gateway/clients.py:
+# enable_thinking=false and skip_special_tokens=false (model emits <|silent|> etc.).
+model:
+  source: /home/dyvm6xra/dyvm6xrauser36/dyvm6xrauser36/huankguan2/Project/aura_v2_demo/main/checkpoints/tt-simple-bench-all-64k-fix/v0-20261023-174822/checkpoint-1467
+  trust_remote_code: true
+  dtype: auto
+
+output:
+  root: outputs-aura-checkpoint-1467
+  fp8_dir: outputs-aura-checkpoint-1467/aura-checkpoint-1467-FP8-Dynamic
+  int8_dir: outputs-aura-checkpoint-1467/aura-checkpoint-1467-INT8-W8A8
+  results_dir: outputs-aura-checkpoint-1467/results
+
+quantization:
+  ignored_layers:
+    - lm_head
+    - "re:.*embed_tokens.*"
+    - "re:.*visual.*"
+    - "re:^mtp\\..*"
+    - "re:.*linear_attn\\.conv1d.*"
+  ignore_linear_attention: false
+
+fp8:
+  scheme: FP8_DYNAMIC
+  device: cuda:0
+  max_workers: 1
+
+int8:
+  # UltraChat is generic text; replace with representative Aura conversations
+  # before treating INT8 as a release candidate.
+  calibration_dataset: HuggingFaceH4/ultrachat_200k
+  calibration_split: train_sft
+  calibration_samples: 512
+  max_sequence_length: 2048
+  seed: 42
+  smoothquant_strength: 0.8
+
+evaluation:
+  seed: 42
+  temperature: 0.0
+  max_tokens: 256
+  max_model_len: 4096
+  tensor_parallel_size: 1
+  gpu_memory_utilization: 0.90
+  repeat_count: 3
+  concurrency: [1, 2, 4]
+  skip_special_tokens: false
+  chat_template_kwargs:
+    enable_thinking: false
+
+serving:
+  standard_vllm_smoke_test: true

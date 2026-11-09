@@ -352,6 +352,14 @@ python scripts/run_experiment.py \
 - 校准数据和评测提示词必须分开。把 `data/evaluation_prompts.jsonl` 里的 `domain_placeholder` 换成能覆盖微调新行为的保留样本。
 - 上线前必须通过标准 vLLM 测试。
 
+## 实验记录
+
+| 实验 | 说明 |
+|---|---|
+| [experiments/aura-checkpoint-1467](experiments/aura-checkpoint-1467/README.md) | 最终目标模型 checkpoint-1467 的 FP8 / INT8 量化、评测结果、运行脚本和 Aura demo 部署方式 |
+
+`scripts/summarize_validation.py <检查点目录>` 可以快速查看一个检查点的验证摘要。
+
 ## 单元测试
 
 测试不下载、不加载 9B 模型，只需要 PyYAML：

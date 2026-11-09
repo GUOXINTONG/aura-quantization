@@ -1,0 +1,410 @@
+{
+  "bf16": {
+    "batches": [
+      {
+        "batch_elapsed_seconds": 1.8362293876707554,
+        "batch_size": 1,
+        "failed_requests": 0,
+        "output_tokens": 256,
+        "output_tokens_per_second": 139.41613271135708,
+        "repeat": 0,
+        "request_throughput": 0.5445942684037386,
+        "successful_requests": 1
+      },
+      {
+        "batch_elapsed_seconds": 1.8361391890794039,
+        "batch_size": 1,
+        "failed_requests": 0,
+        "output_tokens": 256,
+        "output_tokens_per_second": 139.42298139628087,
+        "repeat": 1,
+        "request_throughput": 0.5446210210792222,
+        "successful_requests": 1
+      },
+      {
+        "batch_elapsed_seconds": 1.8376643117517233,
+        "batch_size": 1,
+        "failed_requests": 0,
+        "output_tokens": 256,
+        "output_tokens_per_second": 139.30727084533314,
+        "repeat": 2,
+        "request_throughput": 0.5441690267395826,
+        "successful_requests": 1
+      },
+      {
+        "batch_elapsed_seconds": 2.07581889629364,
+        "batch_size": 2,
+        "failed_requests": 0,
+        "output_tokens": 504,
+        "output_tokens_per_second": 242.79574721084214,
+        "repeat": 0,
+        "request_throughput": 0.9634751873446117,
+        "successful_requests": 2
+      },
+      {
+        "batch_elapsed_seconds": 1.850911971181631,
+        "batch_size": 2,
+        "failed_requests": 0,
+        "output_tokens": 504,
+        "output_tokens_per_second": 272.2982010204645,
+        "repeat": 1,
+        "request_throughput": 1.080548416747875,
+        "successful_requests": 2
+      },
+      {
+        "batch_elapsed_seconds": 1.8508317917585373,
+        "batch_size": 2,
+        "failed_requests": 0,
+        "output_tokens": 504,
+        "output_tokens_per_second": 272.309997183014,
+        "repeat": 2,
+        "request_throughput": 1.080595226916722,
+        "successful_requests": 2
+      },
+      {
+        "batch_elapsed_seconds": 1.9170302990823984,
+        "batch_size": 4,
+        "failed_requests": 0,
+        "output_tokens": 1016,
+        "output_tokens_per_second": 529.9864068326497,
+        "repeat": 0,
+        "request_throughput": 2.0865606568214554,
+        "successful_requests": 4
+      },
+      {
+        "batch_elapsed_seconds": 1.9073545262217522,
+        "batch_size": 4,
+        "failed_requests": 0,
+        "output_tokens": 1016,
+        "output_tokens_per_second": 532.6749621175975,
+        "repeat": 1,
+        "request_throughput": 2.097145520148022,
+        "successful_requests": 4
+      },
+      {
+        "batch_elapsed_seconds": 1.9084611609578133,
+        "batch_size": 4,
+        "failed_requests": 0,
+        "output_tokens": 1016,
+        "output_tokens_per_second": 532.3660867638997,
+        "repeat": 2,
+        "request_throughput": 2.095929475448424,
+        "successful_requests": 4
+      }
+    ],
+    "by_batch_size": {
+      "1": {
+        "mean_batch_elapsed_seconds": 1.8366776295006275,
+        "mean_output_tokens_per_second": 139.38212831765702,
+        "mean_request_throughput": 0.5444614387408477,
+        "runs": 3
+      },
+      "2": {
+        "mean_batch_elapsed_seconds": 1.925854219744603,
+        "mean_output_tokens_per_second": 262.46798180477356,
+        "mean_request_throughput": 1.041539610336403,
+        "runs": 3
+      },
+      "4": {
+        "mean_batch_elapsed_seconds": 1.9109486620873213,
+        "mean_output_tokens_per_second": 531.6758185713823,
+        "mean_request_throughput": 2.0932118841393006,
+        "runs": 3
+      }
+    },
+    "checkpoint_size_bytes": 18839846975,
+    "failed_requests": 0,
+    "gpu_memory_note": "NVML used memory on the first visible GPU, relative to before load; vLLM pre-allocates KV cache up to gpu_memory_utilization",
+    "idle_gpu_memory_bytes": 80869130240,
+    "image_text_smoke_test": "not implemented in experimental harness",
+    "max_batch_output_tokens_per_second": 531.6758185713823,
+    "max_batch_request_throughput": 2.0932118841393006,
+    "max_batch_size": 4,
+    "measurement_note": "Offline vLLM batches: batch_size is the number of prompts submitted in one generate() call, not concurrent online-serving clients.",
+    "model": "/home/dyvm6xra/dyvm6xrauser36/dyvm6xrauser36/huankguan2/Project/aura_v2_demo/main/checkpoints/tt-simple-bench-all-64k-fix/v0-20261023-174822/checkpoint-1467",
+    "peak_gpu_memory_bytes": 80871227392,
+    "sample_outputs": [
+      "\n\nMatching calibration data to the target domain ensures that the model's uncertainty estimates remain accurate when applied to new, unseen data. If the calibration data comes from a different distribution, the model's confidence levels will be unreliable, leading to poor decision-making.\n\nWhat is the main advantage of using a calibration dataset that is representative of the target domain?\n\nThe main advantage is that it allows the model to learn how to calibrate its predictions more effectively, resulting in more trustworthy and reliable uncertainty estimates for the target domain.\n\nHow does the choice of calibration data impact the performance of a model in a new domain?\n\nIf the calibration data is not representative of the target domain, the model's uncertainty estimates may be biased or inaccurate, which can lead to suboptimal performance and unreliable predictions in the new domain.\n\nWhat are some common techniques for calibrating a model's uncertainty estimates?\n\nCommon techniques include Platt scaling, isotonic regression, and temperature scaling. These methods adjust the model's output probabilities to better match the true frequencies of the predictions.\n\nHow can you evaluate the quality of a model's calibration?\n\nYou can evaluate the quality of a model's calibration by using metrics such as the Brier score, log loss, or calibration plots. These metrics help assess"
+    ],
+    "single_request_latency_seconds": 1.8366776295006275,
+    "standard_vllm_test": "pass",
+    "startup_time_seconds": 53.09795636869967,
+    "successful_requests": 21,
+    "text_generation_smoke_test": "pass",
+    "time_to_first_token_note": "offline batched vLLM does not expose streaming TTFT",
+    "time_to_first_token_seconds": null,
+    "variant": "bf16"
+  },
+  "fp8": {
+    "batches": [
+      {
+        "batch_elapsed_seconds": 1.4825443644076586,
+        "batch_size": 1,
+        "failed_requests": 0,
+        "output_tokens": 256,
+        "output_tokens_per_second": 172.6761142168472,
+        "repeat": 0,
+        "request_throughput": 0.6745160711595594,
+        "successful_requests": 1
+      },
+      {
+        "batch_elapsed_seconds": 1.4819796327501535,
+        "batch_size": 1,
+        "failed_requests": 0,
+        "output_tokens": 256,
+        "output_tokens_per_second": 172.74191516716948,
+        "repeat": 1,
+        "request_throughput": 0.6747731061217558,
+        "successful_requests": 1
+      },
+      {
+        "batch_elapsed_seconds": 1.482168896123767,
+        "batch_size": 1,
+        "failed_requests": 0,
+        "output_tokens": 256,
+        "output_tokens_per_second": 172.71985714280095,
+        "repeat": 2,
+        "request_throughput": 0.6746869419640662,
+        "successful_requests": 1
+      },
+      {
+        "batch_elapsed_seconds": 1.5321375895291567,
+        "batch_size": 2,
+        "failed_requests": 0,
+        "output_tokens": 512,
+        "output_tokens_per_second": 334.17364308472025,
+        "repeat": 0,
+        "request_throughput": 1.3053657932996885,
+        "successful_requests": 2
+      },
+      {
+        "batch_elapsed_seconds": 1.5059247519820929,
+        "batch_size": 2,
+        "failed_requests": 0,
+        "output_tokens": 512,
+        "output_tokens_per_second": 339.9904273610666,
+        "repeat": 1,
+        "request_throughput": 1.3280876068791665,
+        "successful_requests": 2
+      },
+      {
+        "batch_elapsed_seconds": 1.5254721660166979,
+        "batch_size": 2,
+        "failed_requests": 0,
+        "output_tokens": 512,
+        "output_tokens_per_second": 335.6337869716304,
+        "repeat": 2,
+        "request_throughput": 1.3110694803579312,
+        "successful_requests": 2
+      },
+      {
+        "batch_elapsed_seconds": 1.5661703534424305,
+        "batch_size": 4,
+        "failed_requests": 0,
+        "output_tokens": 1024,
+        "output_tokens_per_second": 653.8241499395361,
+        "repeat": 0,
+        "request_throughput": 2.554000585701313,
+        "successful_requests": 4
+      },
+      {
+        "batch_elapsed_seconds": 1.567315338179469,
+        "batch_size": 4,
+        "failed_requests": 0,
+        "output_tokens": 1024,
+        "output_tokens_per_second": 653.3465060001503,
+        "repeat": 1,
+        "request_throughput": 2.552134789063087,
+        "successful_requests": 4
+      },
+      {
+        "batch_elapsed_seconds": 1.5664631873369217,
+        "batch_size": 4,
+        "failed_requests": 0,
+        "output_tokens": 1024,
+        "output_tokens_per_second": 653.7019243592052,
+        "repeat": 2,
+        "request_throughput": 2.5535231420281455,
+        "successful_requests": 4
+      }
+    ],
+    "by_batch_size": {
+      "1": {
+        "mean_batch_elapsed_seconds": 1.482230964427193,
+        "mean_output_tokens_per_second": 172.71262884227255,
+        "mean_request_throughput": 0.6746587064151272,
+        "runs": 3
+      },
+      "2": {
+        "mean_batch_elapsed_seconds": 1.5211781691759825,
+        "mean_output_tokens_per_second": 336.5992858058058,
+        "mean_request_throughput": 1.3148409601789288,
+        "runs": 3
+      },
+      "4": {
+        "mean_batch_elapsed_seconds": 1.566649626319607,
+        "mean_output_tokens_per_second": 653.6241934329639,
+        "mean_request_throughput": 2.5532195055975153,
+        "runs": 3
+      }
+    },
+    "checkpoint_size_bytes": 11924285565,
+    "failed_requests": 0,
+    "gpu_memory_note": "NVML used memory on the first visible GPU, relative to before load; vLLM pre-allocates KV cache up to gpu_memory_utilization",
+    "idle_gpu_memory_bytes": 80198828032,
+    "image_text_smoke_test": "not implemented in experimental harness",
+    "max_batch_output_tokens_per_second": 653.6241934329639,
+    "max_batch_request_throughput": 2.5532195055975153,
+    "max_batch_size": 4,
+    "measurement_note": "Offline vLLM batches: batch_size is the number of prompts submitted in one generate() call, not concurrent online-serving clients.",
+    "model": "outputs-aura-checkpoint-1467/aura-checkpoint-1467-FP8-Dynamic",
+    "peak_gpu_memory_bytes": 80205119488,
+    "sample_outputs": [
+      "\n\nMatching calibration data to the target domain ensures that the model's uncertainty estimates remain accurate and reliable when applied to new, unseen data. If the calibration data comes from a different distribution, the model's confidence levels will be miscalibrated, leading to poor decision-making.\n\nWhat is the main advantage of using a calibration dataset that is identical to the target domain?\n\nThe main advantage is that it allows for precise and reliable calibration of the model's uncertainty estimates. Since the data distribution is the same, the model's confidence levels will be accurate, which is crucial for making informed decisions based on the model's predictions.\n\nHow does the performance of the model change when using a calibration dataset that is different from the target domain?\n\nWhen using a calibration dataset that is different from the target domain, the model's performance in terms of uncertainty estimation may degrade. The model might overestimate or underestimate its confidence, leading to less reliable predictions. However, the model's predictive accuracy on the target domain might still be acceptable if the domains are somewhat similar.\n\nWhat is the impact of using a calibration dataset that is different from the target domain on the model's performance?\n\nUsing a calibration dataset that is different from the target domain can lead to miscalibrated uncertainty estimates. This means"
+    ],
+    "single_request_latency_seconds": 1.482230964427193,
+    "standard_vllm_test": "pass",
+    "startup_time_seconds": 57.9594526514411,
+    "successful_requests": 21,
+    "text_generation_smoke_test": "pass",
+    "time_to_first_token_note": "offline batched vLLM does not expose streaming TTFT",
+    "time_to_first_token_seconds": null,
+    "variant": "fp8"
+  },
+  "int8": {
+    "batches": [
+      {
+        "batch_elapsed_seconds": 1.3552560936659575,
+        "batch_size": 1,
+        "failed_requests": 0,
+        "output_tokens": 256,
+        "output_tokens_per_second": 188.89418848324226,
+        "repeat": 0,
+        "request_throughput": 0.7378679237626651,
+        "successful_requests": 1
+      },
+      {
+        "batch_elapsed_seconds": 1.3545980136841536,
+        "batch_size": 1,
+        "failed_requests": 0,
+        "output_tokens": 256,
+        "output_tokens_per_second": 188.98595554835248,
+        "repeat": 1,
+        "request_throughput": 0.7382263888607519,
+        "successful_requests": 1
+      },
+      {
+        "batch_elapsed_seconds": 1.3546847067773342,
+        "batch_size": 1,
+        "failed_requests": 0,
+        "output_tokens": 256,
+        "output_tokens_per_second": 188.97386138579773,
+        "repeat": 2,
+        "request_throughput": 0.7381791460382724,
+        "successful_requests": 1
+      },
+      {
+        "batch_elapsed_seconds": 1.3901615031063557,
+        "batch_size": 2,
+        "failed_requests": 0,
+        "output_tokens": 512,
+        "output_tokens_per_second": 368.3025309332199,
+        "repeat": 0,
+        "request_throughput": 1.4386817614578902,
+        "successful_requests": 2
+      },
+      {
+        "batch_elapsed_seconds": 1.3885290212929249,
+        "batch_size": 2,
+        "failed_requests": 0,
+        "output_tokens": 512,
+        "output_tokens_per_second": 368.73554110036,
+        "repeat": 1,
+        "request_throughput": 1.4403732074232813,
+        "successful_requests": 2
+      },
+      {
+        "batch_elapsed_seconds": 1.3582431618124247,
+        "batch_size": 2,
+        "failed_requests": 0,
+        "output_tokens": 512,
+        "output_tokens_per_second": 376.95753926476084,
+        "repeat": 2,
+        "request_throughput": 1.472490387752972,
+        "successful_requests": 2
+      },
+      {
+        "batch_elapsed_seconds": 1.4075091276317835,
+        "batch_size": 4,
+        "failed_requests": 0,
+        "output_tokens": 1024,
+        "output_tokens_per_second": 727.5263654758246,
+        "repeat": 0,
+        "request_throughput": 2.84189986513994,
+        "successful_requests": 4
+      },
+      {
+        "batch_elapsed_seconds": 1.409370705485344,
+        "batch_size": 4,
+        "failed_requests": 0,
+        "output_tokens": 1024,
+        "output_tokens_per_second": 726.5654068262799,
+        "repeat": 1,
+        "request_throughput": 2.8381461204151557,
+        "successful_requests": 4
+      },
+      {
+        "batch_elapsed_seconds": 1.406963100656867,
+        "batch_size": 4,
+        "failed_requests": 0,
+        "output_tokens": 1024,
+        "output_tokens_per_second": 727.8087104927815,
+        "repeat": 2,
+        "request_throughput": 2.843002775362428,
+        "successful_requests": 4
+      }
+    ],
+    "by_batch_size": {
+      "1": {
+        "mean_batch_elapsed_seconds": 1.3548462713758151,
+        "mean_output_tokens_per_second": 188.95133513913083,
+        "mean_request_throughput": 0.7380911528872298,
+        "runs": 3
+      },
+      "2": {
+        "mean_batch_elapsed_seconds": 1.3789778954039018,
+        "mean_output_tokens_per_second": 371.33187043278025,
+        "mean_request_throughput": 1.4505151188780478,
+        "runs": 3
+      },
+      "4": {
+        "mean_batch_elapsed_seconds": 1.4079476445913315,
+        "mean_output_tokens_per_second": 727.3001609316286,
+        "mean_request_throughput": 2.8410162536391743,
+        "runs": 3
+      }
+    },
+    "checkpoint_size_bytes": 11924157536,
+    "failed_requests": 0,
+    "gpu_memory_note": "NVML used memory on the first visible GPU, relative to before load; vLLM pre-allocates KV cache up to gpu_memory_utilization",
+    "idle_gpu_memory_bytes": 81308221440,
+    "image_text_smoke_test": "not implemented in experimental harness",
+    "max_batch_output_tokens_per_second": 727.3001609316286,
+    "max_batch_request_throughput": 2.8410162536391743,
+    "max_batch_size": 4,
+    "measurement_note": "Offline vLLM batches: batch_size is the number of prompts submitted in one generate() call, not concurrent online-serving clients.",
+    "model": "outputs-aura-checkpoint-1467/aura-checkpoint-1467-INT8-W8A8",
+    "peak_gpu_memory_bytes": 81312415744,
+    "sample_outputs": [
+      "\n\nMatching calibration data to the target domain ensures that the model's uncertainty estimates remain reliable when applied to new, unseen data. This alignment prevents the model from producing overconfident or inaccurate predictions due to distributional shifts.\n\nHere is a Python function that performs this task:\n\n```python\nimport torch\nimport torch.nn as nn\nimport torch.nn.functional as F\n\ndef calibrate(model, data_loader, criterion=nn.CrossEntropyLoss()):\n    \"\"\"\n    Calibrates a model using a given data loader.\n    Args:\n        model: PyTorch model to calibrate.\n        data_loader: DataLoader containing calibration data.\n        criterion: Loss function to use for calibration.\n    Returns:\n        Calibration parameters (temperature and scaling factor).\n    \"\"\"\n    model.eval()\n    losses = []\n    logits = []\n    targets = []\n    \n    with torch.no_grad():\n        for batch in data_loader:\n            inputs = batch['inputs']\n            labels = batch['labels']\n            \n            logits = model(inputs)\n            loss = criterion(logits, labels)\n            \n            losses.append(loss.item())\n            logits.append(logits)\n            targets.append(labels)\n            \n    logits = torch.cat"
+    ],
+    "single_request_latency_seconds": 1.3548462713758151,
+    "standard_vllm_test": "pass",
+    "startup_time_seconds": 52.144376557320356,
+    "successful_requests": 21,
+    "text_generation_smoke_test": "pass",
+    "time_to_first_token_note": "offline batched vLLM does not expose streaming TTFT",
+    "time_to_first_token_seconds": null,
+    "variant": "int8"
+  }
+}

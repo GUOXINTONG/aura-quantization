@@ -10,3 +10,6 @@ outputs-smoke/*
 
 # pip install logs
 *.lo
+
+# Per-run logs written by experiment scripts
+runs/
